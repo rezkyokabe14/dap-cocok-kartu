@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cocokkan Jenis Disabilitas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: header → 5 type columns (each with a Definisi + Contoh slot) → shuffled card tray. Tap a card, then tap its column. Navy matches the DAP "Jenis Disabilitas" slide. */
+:root{--navy:#0B3478;--navy-d:#082757;--teal:#5E9A96;--mint:#AEDCA6;--ok:#2E9E6B;--bad:#D2483F;--paper:#F5F7FB;--line:#D3DAE6;--ink:#14213D;--mute:#5B6478;
+  --font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color-scheme:light}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;min-height:100vh}
+.wrap{max-width:1280px;margin:0 auto;padding:14px 18px 30px;display:flex;flex-direction:column;gap:14px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+header img{height:40px;width:auto}
+.ttl{text-align:center;flex:1}
+.eb{font-size:12px;font-weight:800;letter-spacing:.16em;color:var(--teal);text-transform:uppercase}
+h1{font-size:clamp(22px,3vw,34px);font-weight:800;line-height:1.1;text-wrap:balance}
+.bar{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;font-size:14px;font-weight:700;color:var(--mute)}
+.pill{background:#fff;border:1px solid var(--line);border-radius:30px;padding:6px 14px;font-variant-numeric:tabular-nums}
+.pill b{color:var(--navy)}
+.hint{background:var(--navy);color:#fff;border-radius:14px;padding:10px 16px;font-size:15px;font-weight:600;text-align:center}
+
+.cols{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.col{background:#fff;border:2px solid var(--navy);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .15s,box-shadow .2s,border-color .2s;position:relative}
+.col .cap{background:var(--navy);color:#fff;font-size:11px;font-weight:800;letter-spacing:.08em;text-align:center;padding:6px 4px;line-height:1.15}
+.col .head{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 8px 8px;text-align:center}
+.col .ic{width:54px;height:54px;border-radius:10px;background:var(--navy);color:#fff;display:grid;place-items:center}
+.col .ic svg{width:38px;height:38px}
+.col .nm{font-size:16px;font-weight:800;line-height:1.15}
+.slot{margin:0 8px 8px;border:2px dashed var(--line);border-radius:12px;min-height:92px;display:flex;flex-direction:column;overflow:hidden;transition:border-color .2s,background .2s}
+.slot .st{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);padding:6px 8px 0;text-align:center}
+.slot .sv{flex:1;display:grid;place-items:center;padding:6px 8px 8px;text-align:center;font-size:14px;line-height:1.3;font-weight:600;color:#9AA3B5}
+.slot.none{visibility:hidden}
+.slot.filled{border-style:solid;border-color:var(--ok);background:#EEF8F2}
+.slot.filled .st{color:var(--ok)}
+.slot.filled .sv{color:var(--ink)}
+.slot.filled .sv{animation:land .55s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes land{0%{transform:scale(.6);opacity:0}100%{transform:none;opacity:1}}
+body.picking .col:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(11,52,120,.18)}
+body.picking .col{box-shadow:0 0 0 3px rgba(94,154,150,.25)}
+.col.good{animation:good .7s ease}
+@keyframes good{0%{box-shadow:0 0 0 0 rgba(46,158,107,.7)}100%{box-shadow:0 0 0 18px rgba(46,158,107,0)}}
+.col.bad{animation:shake .45s ease;border-color:var(--bad)}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(4px)}}
+.col.done{border-color:var(--ok)}
+.col.done .cap{background:var(--ok)}
+.col .tick{position:absolute;top:30px;right:8px;width:30px;height:30px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;font-weight:800;transform:scale(0);transition:transform .4s cubic-bezier(.2,.9,.3,1.5)}
+.col.done .tick{transform:scale(1)}
+
+.tray h2{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-bottom:8px;text-align:center}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.card{background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px 12px 12px;text-align:left;font:600 15px/1.35 var(--font);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:transform .15s,border-color .15s,box-shadow .15s,opacity .3s}
+.card .tg{align-self:flex-start;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--navy);border-radius:20px;padding:3px 10px}
+.card.contoh .tg{background:var(--teal)}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(20,33,61,.12)}
+.card.sel{border-color:#E7A94A;box-shadow:0 0 0 4px rgba(231,169,74,.35);transform:translateY(-3px) scale(1.02)}
+.card.bad{animation:shake .45s ease;border-color:var(--bad)}
+.card.gone{opacity:0;transform:scale(.8);pointer-events:none}
+.card:focus-visible,.col:focus-visible{outline:3px solid #7AA4E1;outline-offset:3px}
+
+.win{position:fixed;inset:0;background:rgba(11,39,87,.55);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
+.win.on{display:flex}
+.box{background:#fff;border-radius:26px;padding:30px 34px;text-align:center;max-width:440px;width:100%;animation:pop .5s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pop{from{transform:scale(.7);opacity:0}}
+.box .big{font-size:42px;font-weight:800;color:var(--ok)}
+.box p{font-size:17px;color:var(--mute);margin:10px 0 18px;line-height:1.45}
+.box button,.again{font:800 17px var(--font);background:var(--navy);color:#fff;border:none;border-radius:14px;padding:13px 22px;cursor:pointer}
+.again{background:#fff;color:var(--navy);border:2px solid var(--navy);padding:8px 16px;font-size:14px}
+canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30}
+
+@media (max-width:820px){
+  .cols{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .col .head{flex-direction:row;justify-content:center}
+  .col .ic{width:42px;height:42px}.col .ic svg{width:30px;height:30px}
+  .slot{min-height:70px}
+  .cards{grid-template-columns:1fr 1fr}
+  header img{height:30px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIQAAAAwCAMAAADnwSL2AAAASFBMVEUAAAAJTprw8/ZHebIAO4+bstNbh7pij7yjsdZlZaRwlcSct9NepqbGx+Sy0eLMz+ago919fX10nMV9ff0karC0xd0HZ2cAA3CRLvuQAAAAGHRSTlMA/RHz/Jffl9ME12YDpSNaCAKpAgNVAgJrsmD4AAAEbUlEQVR42u1YgbKrKgzEUKiCRUWt//+nbxNQa1tPa0/vzJ03N3OmRyuQzWYJsUr9s9noHwWLdWqostV1vhiqYUh3A4wfyE36lDtV/f80EeL5A4ueauqJvqKpVpniI7M7Qd3DoreAmuJ00P/phBmWmqahbKAEnFK3526i7zOhtStNxtDdB97uMPRFENrCv2lu1mQkYRybZJdkyhj8iTnnbAwUXqTjfQRlaS4Nre4DvKvsVpXJ2Kle5ygNc6TqbzCBDJSXBQFRMzYq+RfP1mo9C2bWmHVRKf/WBjLvIVCXRpLA3INrhA7O2bsuts61tux7PLR5X4OwJUMQAI03JkfvtF63yxy6gfOb0CeU15Z+Xyd0ygII8By5AHD6YbtY41exTFzp+68VK1uy0lUzmpIpGP1GdPMYs3A/QYDHq+iPIBiCEcmjKlyMsduaJTt2Tv5UBfoDZduVSfmoCk0TtX7EmBmYDnH/pKPZBWHNBTsfmSDyUefAby0Kgqmuf32G0Q4IXV6EAhrjowiWA+zaHgDwTCr5u6cgdImdu0tBHqOqYxQ8BbGvCVQF1Llw3kcgIL5njyBcyVXhbifs9RP0la75AYTjNNg3m5p+mIbZM9UTPgcc7dV0TTZV+WZYO1LClP5nENpTYCGc9vuZ+Yh4kt6fytT1bSYieffM822BzhZ5doguprMCfZWxMBNw4cSsdT7fRDPm1p4IU1rVbTK4BeG2UjzNjYy152iM922YGzo+ziritBluFdDZuTTDKFqWOGlFNt8Y4aISd5Z+AnEXvJxL3u/2quJOc3tZSatqo7Yj/BY6s3ZWpHkIo/OJL7luVP+ibCf/CH288Y13IHnn4ZX6hOoqU3l1psJyMpMq+DG+l1EMoqFRs5IHePMp7dt3pzsQ6VCKfjmM2PVOG92xg5J94zFJJtZlGYQg1sJBRKoB4qqQtLI4WdpScQOCEQBAip9DV/0Pch84KgsnWqIXeeAKi1PogoDAoSBMNF6g1KCGh2OoV+0OCH2eAdT16wojsjTyoTB+ZB3pSPm1LoHoBYQcwBE3WLUozgSPjqpn6WAKEoD3mpKaMwASRiEXcucKB4eikC0I/r6UKsJ7Jelkk48EQp9FBFN7pPIaqVhneBgl3VJjBNEdiMhjEGLLiCFKroZxW728OwsHQ90dakXIJhWdmOGKNYLKJL77XnS6gCBlWZfXgfWZp8jGvjtip0MIhEGOSmpnkaQ5Fw6A6OaLBGKcDI+hLBCZAmlu98dUdYcPvgp5KKLUTs3SBKEoa3YWCCHehYlGPo0k0MoUl9lb7bP+MIgW8ms9qCjzLjf0IEwU0cjoWJaplng8Dqr7ZRtSKa9RA6u+b7tgCwt9S6m2npeW6mylaCBovsAYF+S6V33on5WKT37TS0U5STSEIG/HYe36l0t8nf5RaNfnuKVv/v64Xey93vt7ABYtUcfZ7bq+X8+Y5TKfOzKmW56nKS9/PfkU2+FF/wiIv/I3SvobAqAPUnA4qd3NhK57OGFeL/AfUoYyZy21++4AAAAASUVORK5CYII=" alt="Astra">
+    <div class="ttl"><div class="eb">Disability Awareness Program</div><h1>Cocokkan Jenis Disabilitas</h1></div>
+    <img src="data:image/png;base64,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" alt="Satu Indonesia">
+  </header>
+  <div class="bar"><span class="pill">Cocok <b id="sOk">0</b>/9</span><span class="pill">Salah <b id="sBad">0</b></span><span class="pill">Waktu <b id="sTime">0:00</b></span><button class="again" id="againTop" type="button">Acak ulang</button></div>
+  <div class="hint" id="hint">1. Tap kartu di bawah &nbsp;→&nbsp; 2. Tap jenis disabilitas yang cocok</div>
+  <section class="cols" id="cols"></section>
+  <section class="tray"><h2>Kartu</h2><div class="cards" id="cards"></div></section>
+</div>
+<div class="win" id="win" role="dialog" aria-modal="true" aria-labelledby="winT">
+  <div class="box"><div class="big" id="winT">Semua cocok!</div><p id="winP"></p><button type="button" id="again">Main lagi</button></div>
+</div>
+<canvas id="fx"></canvas>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-fisik" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><circle cx="28" cy="9" r="5" fill="currentColor" stroke="none"/><path d="M27 18v18h17l7 15"/><path d="M27 26h13"/><path d="M19 30a15 15 0 1 0 21 17"/></g></symbol>
+  <symbol id="i-mental" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 56V46c-6-4-10-10-10-18a20 20 0 0 1 40 0c0 3 3 6 5 9l-5 2v7a4 4 0 0 1-4 4h-6v6"/><path d="M26 22c3-4 9-4 12 0M24 30c4 3 10 3 14 0"/></g></symbol>
+  <symbol id="i-intel" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M32 12c-4-5-14-4-16 3-6 1-9 8-6 13-4 4-2 12 4 13 1 6 8 9 13 6 2 3 4 4 5 4"/><path d="M32 12c4-5 14-4 16 3 6 1 9 8 6 13 4 4 2 12-4 13-1 6-8 9-13 6-2 3-4 4-5 4"/><path d="M32 12v39M22 26c3 0 5 2 5 5M42 26c-3 0-5 2-5 5"/></g></symbol>
+  <symbol id="i-sensorik" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22s7-11 18-11 18 11 18 11-7 11-18 11S4 22 4 22z"/><circle cx="22" cy="22" r="5"/><path d="M36 44a10 10 0 0 1 20 0c0 7-7 8-7 14a6 6 0 0 1-11 2"/><path d="M42 45a4 4 0 0 1 8 0c0 3-3 4-3 6"/></g></symbol>
+  <symbol id="i-ganda" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"><circle cx="24" cy="32" r="14"/><circle cx="40" cy="32" r="14"/></g></symbol>
+</defs></svg>
+
+<script>
+const TYPES=[
+ {id:'fisik',nm:'Disabilitas Fisik',def:'Gangguan pada fungsi gerak tubuh seseorang',ex:'Amputasi, lumpuh, cerebral palsy, dan penyakit kronis'},
+ {id:'mental',nm:'Disabilitas Mental',def:'Gangguan fungsi emosi atau perilaku sosial',ex:'Depresi, bipolar, dan skizofrenia'},
+ {id:'intel',nm:'Disabilitas Intelektual',def:'Keterbatasan dalam kemampuan berpikir dan belajar',ex:'Down syndrome, grahita, dan lambat belajar'},
+ {id:'sensorik',nm:'Disabilitas Sensorik',def:'Gangguan pada salah satu panca indera',ex:'Tuli, tunanetra, dan tunawicara'},
+ {id:'ganda',nm:'Disabilitas Ganda',def:'Kombinasi dua atau lebih jenis disabilitas yang berbeda',ex:null},
+];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let sel=null,ok=0,bad=0,t0=0,timerI=null;
+
+function build(){
+  sel=null;ok=0;bad=0;t0=0;clearInterval(timerI);$('sTime').textContent='0:00';
+  $('cols').innerHTML=TYPES.map(t=>`<div class="col" role="button" tabindex="0" data-t="${t.id}" aria-label="${t.nm}">
+    <div class="cap">JENIS<br>DISABILITAS</div><span class="tick" aria-hidden="true">✓</span>
+    <div class="head"><div class="ic"><svg><use href="#i-${t.id}"/></svg></div><div class="nm">${t.nm.replace(' ','<br>')}</div></div>
+    <div class="slot" data-s="def"><div class="st">Definisi</div><div class="sv">?</div></div>
+    <div class="slot${t.ex?'':' none'}" data-s="ex"><div class="st">Contoh</div><div class="sv">?</div></div></div>`).join('');
+  const cards=[];TYPES.forEach(t=>{cards.push({t:t.id,s:'def',txt:t.def});if(t.ex)cards.push({t:t.id,s:'ex',txt:t.ex})});
+  for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]]}
+  $('cards').innerHTML=cards.map((c,i)=>`<button type="button" class="card ${c.s==='ex'?'contoh':''}" data-t="${c.t}" data-s="${c.s}"><span class="tg">${c.s==='def'?'Definisi':'Contoh'}</span>${esc(c.txt)}</button>`).join('');
+  stats();$('hint').textContent='1. Tap kartu di bawah  →  2. Tap jenis disabilitas yang cocok';
+}
+function stats(){$('sOk').textContent=ok;$('sBad').textContent=bad}
+function tick(){const s=Math.floor((Date.now()-t0)/1000);$('sTime').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+
+$('cards').addEventListener('click',e=>{
+  const c=e.target.closest('.card');if(!c||c.classList.contains('gone'))return;
+  if(!t0){t0=Date.now();timerI=setInterval(tick,500)}
+  if(sel)sel.classList.remove('sel');
+  if(sel===c){sel=null;document.body.classList.remove('picking');return}
+  sel=c;c.classList.add('sel');document.body.classList.add('picking');
+  $('hint').textContent='Sekarang tap jenis disabilitas yang cocok dengan kartu ini';
+  if(innerWidth<820)$('cols').scrollIntoView({behavior:'smooth',block:'start'});
+});
+function tryCol(col){
+  if(!sel)return;
+  const card=sel,ok_=card.dataset.t===col.dataset.t;
+  if(ok_){
+    const slot=col.querySelector(`.slot[data-s="${card.dataset.s}"]`);
+    slot.querySelector('.sv').textContent=card.textContent.replace(/^(Definisi|Contoh)/,'');
+    slot.classList.add('filled');card.classList.remove('sel');card.classList.add('gone');setTimeout(()=>card.remove(),300);
+    col.classList.remove('good');void col.offsetWidth;col.classList.add('good');
+    const need=col.querySelectorAll('.slot:not(.none)').length,have=col.querySelectorAll('.slot.filled').length;
+    if(need===have)col.classList.add('done');
+    const r=col.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/3,have===need?70:40);
+    ok++;$('hint').textContent='Benar! Pilih kartu berikutnya';
+    if(ok===9)finish();
+  }else{
+    bad++;[col,card].forEach(el=>{el.classList.remove('bad');void el.offsetWidth;el.classList.add('bad');setTimeout(()=>el.classList.remove('bad'),600)});
+    card.classList.remove('sel');$('hint').textContent='Belum tepat. Coba kartu itu di jenis lain';
+  }
+  sel=null;document.body.classList.remove('picking');stats();
+}
+$('cols').addEventListener('click',e=>{const col=e.target.closest('.col');if(col)tryCol(col)});
+$('cols').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('col')){e.preventDefault();tryCol(e.target)}});
+function finish(){
+  clearInterval(timerI);const s=Math.floor((Date.now()-t0)/1000);
+  $('winP').innerHTML=`Waktu <b>${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}</b> · ${bad?`<b>${bad}</b> kali salah`:'<b>tanpa salah!</b>'}<br>Sekarang diskusikan: bagaimana sikap kita saat berinteraksi dengan rekan dari tiap jenis disabilitas?`;
+  setTimeout(()=>{$('win').classList.add('on');burst(innerWidth/2,innerHeight/3,220)},500);
+}
+$('again').onclick=()=>{$('win').classList.remove('on');build()};$('againTop').onclick=build;
+
+const cv=$('fx'),ctx=cv.getContext('2d');let parts=[],raf=0;
+function burst(x,y,n){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  cv.width=innerWidth;cv.height=innerHeight;
+  const cols=['#0B3478','#5E9A96','#AEDCA6','#E7A94A','#7AA4E1','#2E9E6B'];
+  for(let i=0;i<n;i++){const a=Math.random()*6.28,v=3+Math.random()*7;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-3,r:Math.random()*6,vr:(Math.random()-.5)*.4,w:6+Math.random()*7,h:4+Math.random()*5,c:cols[i%cols.length],l:0})}
+  if(!raf)raf=requestAnimationFrame(step);
+}
+function step(){ctx.clearRect(0,0,cv.width,cv.height);parts=parts.filter(p=>p.l<110);
+  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.25;p.vx*=.98;p.r+=p.vr;p.l++;ctx.globalAlpha=Math.max(0,1-p.l/110);ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore()});
+  ctx.globalAlpha=1;raf=parts.length?requestAnimationFrame(step):0}
+build();
+</script>
+</body>
+</html>
